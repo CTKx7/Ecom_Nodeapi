@@ -23,10 +23,10 @@ const uploadProduct = multer({
 //Routes
 const productRouter = express.Router();
 
-productRouter.post("/product", isLoggedIn, isAdmin , uploadProduct.array("Images"), createProduct);
-productRouter.get("/Product",isLoggedIn ,getProducts);   
-productRouter.get("/Product/:id", getSingleProduct);
-productRouter.put("/Product/:id",isLoggedIn,isAdmin , updateProduct);
-productRouter.delete("/ProductDelete/:id",isLoggedIn, DeleteProduct);
+productRouter.post("/product", isLoggedIn,isAdmin, uploadProduct.array("Images"), createProduct);
+productRouter.get("/allProducts",getProducts);   
+productRouter.get("/singleProduct/:id", getSingleProduct);
+productRouter.put("/updateProduct/:id",isLoggedIn,isAdmin, updateProduct);
+productRouter.delete("/deleteProduct/:id",isLoggedIn,isAdmin, DeleteProduct);
 
 export default productRouter;

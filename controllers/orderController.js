@@ -18,21 +18,21 @@ const stripe = new Stripe(process.env.STRIPE_KEY);
 export const orderCreate = asyncHandler(async (req, res) => {
   // Get The Coupon
   //console.log(req.query);
-  const { Coupon } = req.query;
+  const { Coupon } = req?.query;
 
   const couponFound = await couponModel.findOne({
-    Code: Coupon?.toUpperCase()
-  })
-//console.log(couponFound);
-  if(couponFound?.isExppire){
-    throw new Error("Coupon Has Expired")
+    Code: Coupon?.toUpperCase(),
+  });
+  //console.log(couponFound);
+  if (couponFound?.isExppire) {
+    throw new Error("Coupon Has Expired");
   }
 
-  if(!Coupon){
-    throw new Error("coupon does not Exists")
-  }
+  // if(!couponFound){
+  //   throw new Error("coupon does not Exists")
+  // }
   //get Discount
-const Discount = couponFound?.Discount/100;
+  const Discount = couponFound?.Discount / 100;
 
   //  get the payload(customer,orderItems,shippingAddress,totalPrice);
   const { User, orderItems, shippingAddress, totalPrice } = req.body;
@@ -58,7 +58,7 @@ const Discount = couponFound?.Discount/100;
     totalPrice: couponFound ? totalPrice - totalPrice * Discount : totalPrice,
   });
 
-  console.log(orderCreate)
+  //console.log(orderCreate)
 
   // update the Product qty
   const productFind = await productModel.find({ _id: { $in: orderItems } });
@@ -193,52 +193,53 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
 //@Route         :   Get  /api/v1/orders/sales/sum
 //@Access        :   Private/admin
 
-export const getOrderStats = asyncHandler(async(req,res)=>{
- // get order Stats
-const orders = await orderModel.aggregate([{
-  $group:{
-    _id:null,
-    minimumSales:{
-      $min: "$totalPrice"
+export const getOrderStats = asyncHandler(async (req, res) => {
+  // get order Stats
+  const orders = await orderModel.aggregate([
+    {
+      $group: {
+        _id: null,
+        minimumSales: {
+          $min: "$totalPrice",
+        },
+        totlSales: {
+          $sum: "$totalPrice",
+        },
+        maximumSales: {
+          $max: "$totalPrice",
+        },
+        averageSale: {
+          $avg: "$totalPrice",
+        },
+      },
     },
-    totlSales:{
-      $sum: "$totalPrice"
-    },
-    maximumSales:{
-      $max: "$totalPrice"
-    },
-    averageSale:{
-      $avg: "$totalPrice"
-    }
-  }
-  }]);
+  ]);
 
   const date = new Date();
-  const today = new Date(date.getFullYear(),date.getMonth(),date.getDate())
-   //console.log(today)
-   const saleToday = await orderModel.aggregate([
+  const today = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  //console.log(today)
+  const saleToday = await orderModel.aggregate([
     {
-      $match:{
-        createdAt:{
-            $gte:today
-        }
-      }
+      $match: {
+        createdAt: {
+          $gte: today,
+        },
+      },
     },
     {
-      $group:{
-        _id:null,
-        totalSales:{
-          $sum:"totalPrice"
-        }
-      }
-    }
-   ]);
+      $group: {
+        _id: null,
+        totalSales: {
+          $sum: "totalPrice",
+        },
+      },
+    },
+  ]);
 
-res.status(200).json({
-  success : true,
-  message: "Sum of Orders",
-  orders,
-  saleToday
-})
-
-})
+  res.status(200).json({
+    success: true,
+    message: "Sum of Orders",
+    orders,
+    saleToday,
+  });
+});

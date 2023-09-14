@@ -8,9 +8,9 @@ import isAdmin from '../middlewares/isAdmin.js';
 const colorRouter = express.Router();
 
 colorRouter.post("/color" , isLoggedIn,isAdmin, createColor );
-colorRouter.put("/updateColor/:id", isLoggedIn,isAdmin ,updateColor);
-colorRouter.get("/getallColor", getallColor);
-colorRouter.get("/getsingleColor/:id", getSingleColor);
-colorRouter.delete("/colorDelete/:id",isAdmin ,deletecolor)
+colorRouter.put("/updateColor/:id", isLoggedIn,isAdmin, updateColor);
+colorRouter.get("/allColor", getallColor);
+colorRouter.get("/singleColor/:id", getSingleColor);
+colorRouter.delete("/deleteColor/:id",isAdmin,isAdmin, deletecolor)
 
 export default colorRouter;
